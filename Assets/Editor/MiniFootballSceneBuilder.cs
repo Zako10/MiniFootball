@@ -90,7 +90,7 @@ namespace MiniFootball.EditorTools
             SetObjectReference(gameManager, "player2Spawn", player2Spawn);
             SetObjectReference(gameManager, "ballSpawn", ballSpawn);
             SetObjectReference(gameManager, "scoreboardText", CreateScoreboard());
-            SetFloat(gameManager, "goalLineZ", HalfFieldLength - 0.55f);
+            SetFloat(gameManager, "goalLineZ", HalfFieldLength - 1.2f);
             SetFloat(gameManager, "goalHalfWidth", GoalOpeningHalfWidth);
 
             CreateGoalTrigger("Player 1 Goal Trigger", new Vector3(0f, 1.5f, -HalfFieldLength + 0.35f), GoalSide.Player2, gameManager);
@@ -283,21 +283,34 @@ namespace MiniFootball.EditorTools
             canvasObject.AddComponent<CanvasScaler>();
             canvasObject.AddComponent<GraphicRaycaster>();
 
+            GameObject panelObject = new GameObject("Scoreboard Panel");
+            panelObject.transform.SetParent(canvasObject.transform, false);
+            Image panel = panelObject.AddComponent<Image>();
+            panel.color = new Color(0.03f, 0.05f, 0.07f, 0.72f);
+
+            RectTransform panelRect = panel.GetComponent<RectTransform>();
+            panelRect.anchorMin = new Vector2(0f, 1f);
+            panelRect.anchorMax = new Vector2(0f, 1f);
+            panelRect.pivot = new Vector2(0f, 1f);
+            panelRect.anchoredPosition = new Vector2(18f, -18f);
+            panelRect.sizeDelta = new Vector2(170f, 78f);
+
             GameObject textObject = new GameObject("Scoreboard");
-            textObject.transform.SetParent(canvasObject.transform, false);
+            textObject.transform.SetParent(panelObject.transform, false);
             Text text = textObject.AddComponent<Text>();
             text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            text.fontSize = 18;
+            text.fontSize = 16;
+            text.fontStyle = FontStyle.Bold;
             text.alignment = TextAnchor.MiddleCenter;
             text.color = Color.white;
-            text.text = "P1  0 - 0  P2     60s";
+            text.text = "P1  0 - 0  P2\n60s";
 
             RectTransform rect = text.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.5f, 1f);
-            rect.anchorMax = new Vector2(0.5f, 1f);
-            rect.pivot = new Vector2(0.5f, 1f);
-            rect.anchoredPosition = new Vector2(0f, -18f);
-            rect.sizeDelta = new Vector2(360f, 58f);
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
 
             return text;
         }

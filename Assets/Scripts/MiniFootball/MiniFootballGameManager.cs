@@ -20,7 +20,7 @@ namespace MiniFootball
         [SerializeField] private float matchDuration = 60f;
 
         [Header("Goal Detection")]
-        [SerializeField] private float goalLineZ = 9.45f;
+        [SerializeField] private float goalLineZ = 8.8f;
         [SerializeField] private float goalHalfWidth = 3.25f;
         [SerializeField] private float goalCooldown = 0.75f;
 
@@ -59,12 +59,11 @@ namespace MiniFootball
 
         private void OnGUI()
         {
-            hudStyle ??= CreateStyle(18, TextAnchor.MiddleCenter);
+            hudStyle ??= CreateStyle(16, TextAnchor.MiddleCenter);
             resultStyle ??= CreateStyle(42, TextAnchor.MiddleCenter);
-            hudBackground ??= CreateTexture(new Color(0f, 0f, 0f, 0.58f));
+            hudBackground ??= CreateTexture(new Color(0.03f, 0.05f, 0.07f, 0.72f));
 
-            float width = 360f;
-            Rect hudRect = new Rect((Screen.width - width) * 0.5f, 12f, width, 58f);
+            Rect hudRect = new Rect(18f, 18f, 170f, 78f);
             GUI.DrawTexture(hudRect, hudBackground);
             GUI.Label(hudRect, BuildScoreText(), hudStyle);
 
@@ -197,7 +196,7 @@ namespace MiniFootball
         private string BuildScoreText()
         {
             int seconds = Mathf.CeilToInt(timeRemaining);
-            return $"P1  {Player1Score} - {Player2Score}  P2     {seconds:00}s";
+            return $"P1  {Player1Score} - {Player2Score}  P2\n{seconds:00}s";
         }
 
         private string BuildResultText()
