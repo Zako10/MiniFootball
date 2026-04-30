@@ -114,7 +114,8 @@ namespace MiniFootball.EditorTools
 
             Selection.activeGameObject = player1;
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
-            Debug.Log("MiniFootball local 1v1 scene is ready. Player 1: arrows + Enter/Right Shift. Player 2: WASD + Space.");
+            EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
+            Debug.Log("MiniFootball local 1v1 scene is built and saved. Player 1: arrows + Enter/Right Shift. Player 2: WASD + Space.");
         }
 
         private static GameObject InstantiatePrefab(string path, string objectName, Vector3 position, Quaternion rotation)
