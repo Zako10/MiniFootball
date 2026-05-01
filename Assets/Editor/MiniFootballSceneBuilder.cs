@@ -299,7 +299,7 @@ namespace MiniFootball.EditorTools
             GameObject textObject = new GameObject("Scoreboard");
             textObject.transform.SetParent(panelObject.transform, false);
             Text text = textObject.AddComponent<Text>();
-            text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = 16;
             text.fontStyle = FontStyle.Bold;
             text.alignment = TextAnchor.MiddleCenter;
