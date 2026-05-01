@@ -5,7 +5,7 @@ namespace MiniFootball
     [RequireComponent(typeof(Rigidbody))]
     public class PlayAreaLimiter : MonoBehaviour
     {
-        [SerializeField] private Vector2 halfSize = new Vector2(5.7f, 11.15f);
+        [SerializeField] private Vector2 halfSize = new Vector2(5.55f, 10.85f);
         [SerializeField] private float minimumY = -0.4f;
         [SerializeField] private float resetY = 0.8f;
         [SerializeField] private float maxHorizontalSpeed = 8f;
@@ -15,6 +15,7 @@ namespace MiniFootball
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
+            halfSize = new Vector2(Mathf.Min(halfSize.x, 5.55f), Mathf.Min(halfSize.y, 10.85f));
         }
 
         private void FixedUpdate()

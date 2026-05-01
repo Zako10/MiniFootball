@@ -17,12 +17,12 @@ namespace MiniFootball
 
         [Header("HUD")]
         [SerializeField] private Text scoreboardText;
+        [SerializeField] private Text goalMessageText;
         [SerializeField] private float matchDuration = 60f;
 
         [Header("Goal Detection")]
-        [SerializeField] private float goalLineZ = 8.8f;
-        [SerializeField] private float goalHalfWidth = 3.25f;
         [SerializeField] private float goalCooldown = 0.75f;
+        [SerializeField] private float goalMessageDuration = 1.35f;
 
         public int Player1Score { get; private set; }
         public int Player2Score { get; private set; }
@@ -33,6 +33,8 @@ namespace MiniFootball
         private GUIStyle resultStyle;
         private Texture2D hudBackground;
         private float nextGoalTime;
+        private float goalMessageUntil;
+        private string goalMessage;
 
         private void Start()
         {
@@ -53,8 +55,8 @@ namespace MiniFootball
                 matchEnded = true;
             }
 
-            CheckGoalByPosition();
             UpdateScoreboard();
+            UpdateGoalMessage();
         }
 
         private void OnGUI()
@@ -66,6 +68,11 @@ namespace MiniFootball
             Rect hudRect = new Rect(18f, 18f, 170f, 78f);
             GUI.DrawTexture(hudRect, hudBackground);
             GUI.Label(hudRect, BuildScoreText(), hudStyle);
+
+            if (!string.IsNullOrEmpty(goalMessage) && Time.time < goalMessageUntil)
+            {
+                GUI.Label(new Rect(0f, Screen.height * 0.18f, Screen.width, 90f), goalMessage, resultStyle);
+            }
 
             if (matchEnded)
             {
@@ -95,8 +102,11 @@ namespace MiniFootball
             }
 
             Debug.Log($"Score: Player 1 {Player1Score} - {Player2Score} Player 2");
+            goalMessage = scoringSide == GoalSide.Player1 ? "GOAL! Player 1" : "GOAL! Player 2";
+            goalMessageUntil = Time.time + goalMessageDuration;
             nextGoalTime = Time.time + goalCooldown;
             UpdateScoreboard();
+            UpdateGoalMessage();
             ResetRoundAfterGoal(scoringSide);
         }
 
@@ -146,23 +156,6 @@ namespace MiniFootball
             ball.angularVelocity = Vector3.zero;
         }
 
-        private void CheckGoalByPosition()
-        {
-            if (ball == null || Time.time < nextGoalTime || Mathf.Abs(ball.position.x) > goalHalfWidth)
-            {
-                return;
-            }
-
-            if (ball.position.z <= -goalLineZ)
-            {
-                ScoreGoal(GoalSide.Player2);
-            }
-            else if (ball.position.z >= goalLineZ)
-            {
-                ScoreGoal(GoalSide.Player1);
-            }
-        }
-
         private void GiveKickoffTo(Transform target)
         {
             if (ball == null || target == null)
@@ -191,6 +184,18 @@ namespace MiniFootball
             }
 
             scoreboardText.text = BuildScoreText();
+        }
+
+        private void UpdateGoalMessage()
+        {
+            if (goalMessageText == null)
+            {
+                return;
+            }
+
+            bool shouldShow = !string.IsNullOrEmpty(goalMessage) && Time.time < goalMessageUntil;
+            goalMessageText.enabled = shouldShow;
+            goalMessageText.text = shouldShow ? goalMessage : string.Empty;
         }
 
         private string BuildScoreText()

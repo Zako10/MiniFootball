@@ -50,13 +50,13 @@ namespace MiniFootball
             {
                 x = ReadAxis(keyboard.leftArrowKey, keyboard.rightArrowKey);
                 z = ReadAxis(keyboard.downArrowKey, keyboard.upArrowKey);
-                jumpPressed = keyboard.rightShiftKey.wasPressedThisFrame || keyboard.enterKey.wasPressedThisFrame;
+                jumpPressed = keyboard.spaceKey.wasPressedThisFrame;
             }
             else
             {
                 x = ReadAxis(keyboard.aKey, keyboard.dKey);
                 z = ReadAxis(keyboard.sKey, keyboard.wKey);
-                jumpPressed = keyboard.spaceKey.wasPressedThisFrame;
+                jumpPressed = keyboard.leftShiftKey.wasPressedThisFrame;
             }
 
             moveInput = new Vector3(x, 0f, z).normalized;

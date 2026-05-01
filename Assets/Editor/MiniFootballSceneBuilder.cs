@@ -12,31 +12,29 @@ namespace MiniFootball.EditorTools
         private const string BallPrefabPath = "Assets/Lightning Poly/Football Essentials 3D/Prefabs/Ball.prefab";
         private const string GroundPrefabPath = "Assets/Lightning Poly/Football Essentials 3D/Prefabs/Ground.prefab";
         private const string GoalPrefabPath = "Assets/Lightning Poly/Football Essentials 3D/Prefabs/Goal.prefab";
-        private const float FieldWidth = 12f;
-        private const float FieldLength = 20f;
-        private const float HalfFieldWidth = FieldWidth * 0.5f;
-        private const float HalfFieldLength = FieldLength * 0.5f;
-        private const float GoalOpeningHalfWidth = 3.2f;
+        private const string SettingsAssetPath = "Assets/Settings/MiniFootballSceneSettings.asset";
 
         [MenuItem("MiniFootball/Build First Playable Scene")]
         public static void BuildFirstPlayableScene()
         {
+            MiniFootballSceneSettings settings = LoadOrCreateSettings();
             EnsureBallTag();
             ClearPreviousSetup();
 
             GameObject ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
             ground.name = "Ground";
-            ground.transform.position = new Vector3(0f, -0.05f, 0f);
-            ground.transform.localScale = new Vector3(FieldWidth, 0.1f, FieldLength);
+            ground.transform.position = new Vector3(0f, settings.groundY, 0f);
+            ground.transform.localScale = new Vector3(settings.fieldWidth, 0.1f, settings.fieldLength);
             EnsureGroundMarker(ground);
-            SetMaterialColor(ground, new Color(0.12f, 0.55f, 0.2f));
-            CreatePitchLines();
-            CreateBoundaryWalls();
+            SetMaterialColor(ground, settings.groundColor);
+            CreatePitchLines(settings);
+            CreateBoundaryWalls(settings);
+            CreateSportsBackdrop(settings);
 
             GameObject ball = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             ball.name = "Ball";
-            ball.transform.position = new Vector3(0f, 0.35f, 0f);
-            ball.transform.localScale = Vector3.one * 0.5f;
+            ball.transform.position = settings.ballSpawnPosition;
+            ball.transform.localScale = Vector3.one * settings.ballScale;
             ball.tag = "Ball";
             Rigidbody ballRb = EnsureRigidbody(ball);
             ballRb.mass = 0.8f;
@@ -46,35 +44,35 @@ namespace MiniFootball.EditorTools
             EnsureCollider(ball);
             SetPhysicsMaterial(ball, 0.6f, 0.05f);
             ball.AddComponent<LightningPoly.FootballEssentials3D.Ball>();
-            AddPlayAreaLimiter(ball);
+            AddPlayAreaLimiter(ball, settings.playAreaHalfSize);
             SetMaterialColor(ball, Color.white);
 
-            GameObject player1 = InstantiatePrefab(CharacterPrefabPath, "Player 1", new Vector3(0f, 1f, -4.5f), Quaternion.identity);
-            player1.transform.localScale = Vector3.one * 1.15f;
+            GameObject player1 = InstantiatePrefab(CharacterPrefabPath, "Player 1", settings.player1SpawnPosition, Quaternion.identity);
+            player1.transform.localScale = Vector3.one * settings.playerScale;
             CleanDemoPlayerScript(player1);
             EnsureRigidbody(player1).constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
             EnsureCollider(player1);
             SimplePlayerController player1Controller = player1.AddComponent<SimplePlayerController>();
             SetControlScheme(player1Controller, SimplePlayerController.ControlScheme.Arrows);
-            AddPlayAreaLimiter(player1);
-            SetMaterialColorRecursive(player1, new Color(0.1f, 0.35f, 1f));
+            AddPlayAreaLimiter(player1, settings.playAreaHalfSize);
+            SetMaterialColorRecursive(player1, settings.player1Color);
 
-            GameObject player2 = InstantiatePrefab(CharacterPrefabPath, "Player 2", new Vector3(0f, 1f, 4.5f), Quaternion.Euler(0f, 180f, 0f));
-            player2.transform.localScale = Vector3.one * 1.15f;
+            GameObject player2 = InstantiatePrefab(CharacterPrefabPath, "Player 2", settings.player2SpawnPosition, Quaternion.Euler(0f, 180f, 0f));
+            player2.transform.localScale = Vector3.one * settings.playerScale;
             CleanDemoPlayerScript(player2);
             EnsureRigidbody(player2).constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
             EnsureCollider(player2);
             SimplePlayerController player2Controller = player2.AddComponent<SimplePlayerController>();
             SetControlScheme(player2Controller, SimplePlayerController.ControlScheme.Wasd);
-            AddPlayAreaLimiter(player2);
-            SetMaterialColorRecursive(player2, new Color(1f, 0.18f, 0.12f));
+            AddPlayAreaLimiter(player2, settings.playAreaHalfSize);
+            SetMaterialColorRecursive(player2, settings.player2Color);
 
-            GameObject player1Goal = InstantiatePrefab(GoalPrefabPath, "Player 1 Goal", new Vector3(0f, 0f, -HalfFieldLength), Quaternion.identity);
-            player1Goal.transform.localScale = new Vector3(2.6f, 2.2f, 2.2f);
+            GameObject player1Goal = InstantiatePrefab(GoalPrefabPath, "Player 1 Goal", new Vector3(0f, 0f, -settings.HalfFieldLength), Quaternion.identity);
+            player1Goal.transform.localScale = settings.goalScale;
             SetMaterialColorRecursive(player1Goal, Color.white);
 
-            GameObject player2Goal = InstantiatePrefab(GoalPrefabPath, "Player 2 Goal", new Vector3(0f, 0f, HalfFieldLength), Quaternion.Euler(0f, 180f, 0f));
-            player2Goal.transform.localScale = new Vector3(2.6f, 2.2f, 2.2f);
+            GameObject player2Goal = InstantiatePrefab(GoalPrefabPath, "Player 2 Goal", new Vector3(0f, 0f, settings.HalfFieldLength), Quaternion.Euler(0f, 180f, 0f));
+            player2Goal.transform.localScale = settings.goalScale;
             SetMaterialColorRecursive(player2Goal, Color.white);
 
             Transform player1Spawn = CreateSpawn("Player1Spawn", player1.transform.position, player1.transform.rotation);
@@ -83,25 +81,25 @@ namespace MiniFootball.EditorTools
 
             GameObject gameManagerObject = new GameObject("GameManager");
             MiniFootballGameManager gameManager = gameManagerObject.AddComponent<MiniFootballGameManager>();
+            Text[] hudTexts = CreateHud();
             SetObjectReference(gameManager, "player1", player1.transform);
             SetObjectReference(gameManager, "player2", player2.transform);
             SetObjectReference(gameManager, "ball", ballRb);
             SetObjectReference(gameManager, "player1Spawn", player1Spawn);
             SetObjectReference(gameManager, "player2Spawn", player2Spawn);
             SetObjectReference(gameManager, "ballSpawn", ballSpawn);
-            SetObjectReference(gameManager, "scoreboardText", CreateScoreboard());
-            SetFloat(gameManager, "goalLineZ", HalfFieldLength - 1.2f);
-            SetFloat(gameManager, "goalHalfWidth", GoalOpeningHalfWidth);
+            SetObjectReference(gameManager, "scoreboardText", hudTexts[0]);
+            SetObjectReference(gameManager, "goalMessageText", hudTexts[1]);
 
-            CreateGoalTrigger("Player 1 Goal Trigger", new Vector3(0f, 1.5f, -HalfFieldLength + 0.35f), GoalSide.Player2, gameManager);
-            CreateGoalTrigger("Player 2 Goal Trigger", new Vector3(0f, 1.5f, HalfFieldLength - 0.35f), GoalSide.Player1, gameManager);
+            CreateGoalTrigger("Player 1 Goal Trigger", new Vector3(0f, settings.goalTriggerHeight * 0.5f, -settings.HalfFieldLength - 0.1f), GoalSide.Player2, gameManager, settings);
+            CreateGoalTrigger("Player 2 Goal Trigger", new Vector3(0f, settings.goalTriggerHeight * 0.5f, settings.HalfFieldLength + 0.1f), GoalSide.Player1, gameManager, settings);
 
             Camera mainCamera = Camera.main;
             if (mainCamera != null)
             {
-                mainCamera.transform.position = player1.transform.position + new Vector3(0f, 6.5f, -7.5f);
-                mainCamera.transform.rotation = Quaternion.Euler(48f, 0f, 0f);
-                mainCamera.fieldOfView = 55f;
+                mainCamera.transform.position = player1.transform.position + settings.cameraOffset;
+                mainCamera.transform.rotation = Quaternion.Euler(settings.cameraEuler);
+                mainCamera.fieldOfView = settings.cameraFov;
                 SimpleFollowCamera followCamera = mainCamera.GetComponent<SimpleFollowCamera>();
                 if (followCamera == null)
                 {
@@ -109,13 +107,13 @@ namespace MiniFootball.EditorTools
                 }
 
                 SetObjectReference(followCamera, "target", player1.transform);
-                SetVector3(followCamera, "offset", new Vector3(0f, 6.5f, -7.5f));
+                SetVector3(followCamera, "offset", settings.cameraOffset);
             }
 
             Selection.activeGameObject = player1;
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
             EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
-            Debug.Log("MiniFootball local 1v1 scene is built and saved. Player 1: arrows + Enter/Right Shift. Player 2: WASD + Space.");
+            Debug.Log("MiniFootball local 1v1 scene is built and saved. Player 1: arrows + Space. Player 2: WASD + Left Shift.");
         }
 
         private static GameObject InstantiatePrefab(string path, string objectName, Vector3 position, Quaternion rotation)
@@ -160,7 +158,8 @@ namespace MiniFootball.EditorTools
                 "Pitch Lines",
                 "Boundary Walls",
                 "HUD Canvas",
-                "SM_Stadium"
+                "SM_Stadium",
+                "Sports Backdrop"
             };
 
             foreach (string objectName in names)
@@ -180,12 +179,12 @@ namespace MiniFootball.EditorTools
             return spawn.transform;
         }
 
-        private static void CreateGoalTrigger(string objectName, Vector3 position, GoalSide scoringSide, MiniFootballGameManager gameManager)
+        private static void CreateGoalTrigger(string objectName, Vector3 position, GoalSide scoringSide, MiniFootballGameManager gameManager, MiniFootballSceneSettings settings)
         {
             GameObject trigger = GameObject.CreatePrimitive(PrimitiveType.Cube);
             trigger.name = objectName;
             trigger.transform.position = position;
-            trigger.transform.localScale = new Vector3(GoalOpeningHalfWidth * 2f, 4.2f, 1.2f);
+            trigger.transform.localScale = new Vector3(settings.goalOpeningHalfWidth * 2f, settings.goalTriggerHeight, settings.goalTriggerDepth);
 
             MeshRenderer renderer = trigger.GetComponent<MeshRenderer>();
             if (renderer != null)
@@ -199,42 +198,83 @@ namespace MiniFootball.EditorTools
             GoalDetector goalDetector = trigger.AddComponent<GoalDetector>();
             SetEnum(goalDetector, "scoringSide", scoringSide);
             SetObjectReference(goalDetector, "gameManager", gameManager);
+            SetFloat(goalDetector, "goalHalfWidth", settings.goalOpeningHalfWidth);
+            SetFloat(goalDetector, "goalZ", settings.HalfFieldLength + 0.1f);
+            SetFloat(goalDetector, "maximumBallHeight", settings.goalTriggerHeight);
         }
 
-        private static void CreatePitchLines()
+        private static void CreatePitchLines(MiniFootballSceneSettings settings)
         {
             GameObject parent = new GameObject("Pitch Lines");
-            Color lineColor = new Color(0.94f, 0.94f, 0.88f);
+            Color lineColor = settings.lineColor;
 
-            CreateLine(parent.transform, "Left Touchline", new Vector3(-HalfFieldWidth, 0.006f, 0f), new Vector3(0.12f, 0.012f, FieldLength), lineColor);
-            CreateLine(parent.transform, "Right Touchline", new Vector3(HalfFieldWidth, 0.006f, 0f), new Vector3(0.12f, 0.012f, FieldLength), lineColor);
-            CreateLine(parent.transform, "Player Goal Line", new Vector3(0f, 0.006f, -HalfFieldLength), new Vector3(FieldWidth, 0.012f, 0.12f), lineColor);
-            CreateLine(parent.transform, "Computer Goal Line", new Vector3(0f, 0.006f, HalfFieldLength), new Vector3(FieldWidth, 0.012f, 0.12f), lineColor);
-            CreateLine(parent.transform, "Halfway Line", new Vector3(0f, 0.007f, 0f), new Vector3(FieldWidth, 0.012f, 0.1f), lineColor);
-            CreateLine(parent.transform, "Player Box", new Vector3(0f, 0.008f, -HalfFieldLength + 2f), new Vector3(5.4f, 0.012f, 0.1f), lineColor);
-            CreateLine(parent.transform, "Player Box Left", new Vector3(-2.7f, 0.008f, -HalfFieldLength + 1f), new Vector3(0.1f, 0.012f, 2f), lineColor);
-            CreateLine(parent.transform, "Player Box Right", new Vector3(2.7f, 0.008f, -HalfFieldLength + 1f), new Vector3(0.1f, 0.012f, 2f), lineColor);
-            CreateLine(parent.transform, "Computer Box", new Vector3(0f, 0.008f, HalfFieldLength - 2f), new Vector3(5.4f, 0.012f, 0.1f), lineColor);
-            CreateLine(parent.transform, "Computer Box Left", new Vector3(-2.7f, 0.008f, HalfFieldLength - 1f), new Vector3(0.1f, 0.012f, 2f), lineColor);
-            CreateLine(parent.transform, "Computer Box Right", new Vector3(2.7f, 0.008f, HalfFieldLength - 1f), new Vector3(0.1f, 0.012f, 2f), lineColor);
+            CreateLine(parent.transform, "Left Touchline", new Vector3(-settings.HalfFieldWidth, 0.006f, 0f), new Vector3(0.12f, 0.012f, settings.fieldLength), lineColor);
+            CreateLine(parent.transform, "Right Touchline", new Vector3(settings.HalfFieldWidth, 0.006f, 0f), new Vector3(0.12f, 0.012f, settings.fieldLength), lineColor);
+            CreateLine(parent.transform, "Player Goal Line", new Vector3(0f, 0.006f, -settings.HalfFieldLength), new Vector3(settings.fieldWidth, 0.012f, 0.12f), lineColor);
+            CreateLine(parent.transform, "Computer Goal Line", new Vector3(0f, 0.006f, settings.HalfFieldLength), new Vector3(settings.fieldWidth, 0.012f, 0.12f), lineColor);
+            CreateLine(parent.transform, "Halfway Line", new Vector3(0f, 0.007f, 0f), new Vector3(settings.fieldWidth, 0.012f, 0.1f), lineColor);
+            CreateLine(parent.transform, "Player Box", new Vector3(0f, 0.008f, -settings.HalfFieldLength + 2f), new Vector3(5.4f, 0.012f, 0.1f), lineColor);
+            CreateLine(parent.transform, "Player Box Left", new Vector3(-2.7f, 0.008f, -settings.HalfFieldLength + 1f), new Vector3(0.1f, 0.012f, 2f), lineColor);
+            CreateLine(parent.transform, "Player Box Right", new Vector3(2.7f, 0.008f, -settings.HalfFieldLength + 1f), new Vector3(0.1f, 0.012f, 2f), lineColor);
+            CreateLine(parent.transform, "Computer Box", new Vector3(0f, 0.008f, settings.HalfFieldLength - 2f), new Vector3(5.4f, 0.012f, 0.1f), lineColor);
+            CreateLine(parent.transform, "Computer Box Left", new Vector3(-2.7f, 0.008f, settings.HalfFieldLength - 1f), new Vector3(0.1f, 0.012f, 2f), lineColor);
+            CreateLine(parent.transform, "Computer Box Right", new Vector3(2.7f, 0.008f, settings.HalfFieldLength - 1f), new Vector3(0.1f, 0.012f, 2f), lineColor);
             CreateCircle(parent.transform, "Center Circle", Vector3.zero, 1.8f, 40, lineColor);
         }
 
-        private static void CreateBoundaryWalls()
+        private static void CreateBoundaryWalls(MiniFootballSceneSettings settings)
         {
             GameObject parent = new GameObject("Boundary Walls");
-            Color railColor = new Color(0.18f, 0.18f, 0.2f);
-            float wallHeight = 1f;
-            float wallThickness = 0.35f;
-            float endWallLength = HalfFieldWidth - GoalOpeningHalfWidth;
-            float endWallCenterX = GoalOpeningHalfWidth + endWallLength * 0.5f;
+            Color railColor = settings.wallColor;
+            Color netColor = settings.goalNetColor;
+            float wallHeight = settings.wallHeight;
+            float wallThickness = settings.wallThickness;
+            float endWallLength = settings.HalfFieldWidth - settings.goalOpeningHalfWidth;
+            float endWallCenterX = settings.goalOpeningHalfWidth + endWallLength * 0.5f;
+            float goalSideX = settings.goalOpeningHalfWidth + wallThickness * 0.5f;
+            float goalBackZ = settings.HalfFieldLength + settings.goalDepth;
+            float goalSideZ = settings.HalfFieldLength + settings.goalDepth * 0.5f;
 
-            CreateBox(parent.transform, "Left Wall", new Vector3(-HalfFieldWidth - wallThickness * 0.5f, wallHeight * 0.5f, 0f), new Vector3(wallThickness, wallHeight, FieldLength), railColor);
-            CreateBox(parent.transform, "Right Wall", new Vector3(HalfFieldWidth + wallThickness * 0.5f, wallHeight * 0.5f, 0f), new Vector3(wallThickness, wallHeight, FieldLength), railColor);
-            CreateBox(parent.transform, "Player End Wall Left", new Vector3(-endWallCenterX, wallHeight * 0.5f, -HalfFieldLength - wallThickness * 0.5f), new Vector3(endWallLength, wallHeight, wallThickness), railColor);
-            CreateBox(parent.transform, "Player End Wall Right", new Vector3(endWallCenterX, wallHeight * 0.5f, -HalfFieldLength - wallThickness * 0.5f), new Vector3(endWallLength, wallHeight, wallThickness), railColor);
-            CreateBox(parent.transform, "Computer End Wall Left", new Vector3(-endWallCenterX, wallHeight * 0.5f, HalfFieldLength + wallThickness * 0.5f), new Vector3(endWallLength, wallHeight, wallThickness), railColor);
-            CreateBox(parent.transform, "Computer End Wall Right", new Vector3(endWallCenterX, wallHeight * 0.5f, HalfFieldLength + wallThickness * 0.5f), new Vector3(endWallLength, wallHeight, wallThickness), railColor);
+            CreateBox(parent.transform, "Left Wall", new Vector3(-settings.HalfFieldWidth - wallThickness * 0.5f, wallHeight * 0.5f, 0f), new Vector3(wallThickness, wallHeight, settings.fieldLength + settings.goalDepth * 2f), railColor);
+            CreateBox(parent.transform, "Right Wall", new Vector3(settings.HalfFieldWidth + wallThickness * 0.5f, wallHeight * 0.5f, 0f), new Vector3(wallThickness, wallHeight, settings.fieldLength + settings.goalDepth * 2f), railColor);
+            CreateBox(parent.transform, "Player End Wall Left", new Vector3(-endWallCenterX, wallHeight * 0.5f, -settings.HalfFieldLength - wallThickness * 0.5f), new Vector3(endWallLength, wallHeight, wallThickness), railColor);
+            CreateBox(parent.transform, "Player End Wall Right", new Vector3(endWallCenterX, wallHeight * 0.5f, -settings.HalfFieldLength - wallThickness * 0.5f), new Vector3(endWallLength, wallHeight, wallThickness), railColor);
+            CreateBox(parent.transform, "Computer End Wall Left", new Vector3(-endWallCenterX, wallHeight * 0.5f, settings.HalfFieldLength + wallThickness * 0.5f), new Vector3(endWallLength, wallHeight, wallThickness), railColor);
+            CreateBox(parent.transform, "Computer End Wall Right", new Vector3(endWallCenterX, wallHeight * 0.5f, settings.HalfFieldLength + wallThickness * 0.5f), new Vector3(endWallLength, wallHeight, wallThickness), railColor);
+            CreateBox(parent.transform, "Player Goal Back Wall", new Vector3(0f, wallHeight * 0.5f, -goalBackZ), new Vector3(settings.goalOpeningHalfWidth * 2f + wallThickness * 2f, wallHeight, wallThickness), netColor);
+            CreateBox(parent.transform, "Computer Goal Back Wall", new Vector3(0f, wallHeight * 0.5f, goalBackZ), new Vector3(settings.goalOpeningHalfWidth * 2f + wallThickness * 2f, wallHeight, wallThickness), netColor);
+            CreateBox(parent.transform, "Player Goal Left Wall", new Vector3(-goalSideX, wallHeight * 0.5f, -goalSideZ), new Vector3(wallThickness, wallHeight, settings.goalDepth + wallThickness), netColor);
+            CreateBox(parent.transform, "Player Goal Right Wall", new Vector3(goalSideX, wallHeight * 0.5f, -goalSideZ), new Vector3(wallThickness, wallHeight, settings.goalDepth + wallThickness), netColor);
+            CreateBox(parent.transform, "Computer Goal Left Wall", new Vector3(-goalSideX, wallHeight * 0.5f, goalSideZ), new Vector3(wallThickness, wallHeight, settings.goalDepth + wallThickness), netColor);
+            CreateBox(parent.transform, "Computer Goal Right Wall", new Vector3(goalSideX, wallHeight * 0.5f, goalSideZ), new Vector3(wallThickness, wallHeight, settings.goalDepth + wallThickness), netColor);
+        }
+
+        private static void CreateSportsBackdrop(MiniFootballSceneSettings settings)
+        {
+            GameObject parent = new GameObject("Sports Backdrop");
+            Camera mainCamera = Camera.main;
+            if (mainCamera != null)
+            {
+                mainCamera.clearFlags = CameraClearFlags.SolidColor;
+                mainCamera.backgroundColor = settings.skyColor;
+            }
+
+            Light directionalLight = Object.FindAnyObjectByType<Light>();
+            if (directionalLight != null)
+            {
+                directionalLight.intensity = 1.35f;
+                directionalLight.transform.rotation = Quaternion.Euler(48f, -32f, 0f);
+            }
+
+            CreateDecorBox(parent.transform, "North Stand Base", new Vector3(0f, 1f, settings.HalfFieldLength + 4f), new Vector3(15f, 2f, 1.2f), settings.standDarkColor);
+            CreateDecorBox(parent.transform, "South Stand Base", new Vector3(0f, 1f, -settings.HalfFieldLength - 4f), new Vector3(15f, 2f, 1.2f), settings.standDarkColor);
+            CreateDecorBox(parent.transform, "North Stand Seats", new Vector3(0f, 2.3f, settings.HalfFieldLength + 4.35f), new Vector3(14.2f, 1.2f, 0.45f), settings.standBlueColor);
+            CreateDecorBox(parent.transform, "South Stand Seats", new Vector3(0f, 2.3f, -settings.HalfFieldLength - 4.35f), new Vector3(14.2f, 1.2f, 0.45f), settings.standRedColor);
+            CreateDecorBox(parent.transform, "Left Advertising Board", new Vector3(-settings.HalfFieldWidth - 1.15f, 0.45f, 0f), new Vector3(0.18f, 0.9f, settings.fieldLength), settings.adLeftColor);
+            CreateDecorBox(parent.transform, "Right Advertising Board", new Vector3(settings.HalfFieldWidth + 1.15f, 0.45f, 0f), new Vector3(0.18f, 0.9f, settings.fieldLength), settings.adRightColor);
+
+            CreateDecorBox(parent.transform, "Left Floodlight", new Vector3(-settings.HalfFieldWidth - 2f, 5.8f, -settings.HalfFieldLength - 2f), new Vector3(0.4f, 0.25f, 1.8f), settings.floodlightColor);
+            CreateDecorBox(parent.transform, "Right Floodlight", new Vector3(settings.HalfFieldWidth + 2f, 5.8f, settings.HalfFieldLength + 2f), new Vector3(0.4f, 0.25f, 1.8f), settings.floodlightColor);
         }
 
         private static void CreateCircle(Transform parent, string objectName, Vector3 center, float radius, int segments, Color color)
@@ -276,7 +316,19 @@ namespace MiniFootball.EditorTools
             return box;
         }
 
-        private static Text CreateScoreboard()
+        private static GameObject CreateDecorBox(Transform parent, string objectName, Vector3 position, Vector3 scale, Color color)
+        {
+            GameObject box = CreateBox(parent, objectName, position, scale, color);
+            Collider collider = box.GetComponent<Collider>();
+            if (collider != null)
+            {
+                Object.DestroyImmediate(collider);
+            }
+
+            return box;
+        }
+
+        private static Text[] CreateHud()
         {
             GameObject canvasObject = new GameObject("HUD Canvas");
             Canvas canvas = canvasObject.AddComponent<Canvas>();
@@ -313,7 +365,25 @@ namespace MiniFootball.EditorTools
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
-            return text;
+            GameObject goalObject = new GameObject("Goal Message");
+            goalObject.transform.SetParent(canvasObject.transform, false);
+            Text goalText = goalObject.AddComponent<Text>();
+            goalText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            goalText.fontSize = 46;
+            goalText.fontStyle = FontStyle.Bold;
+            goalText.alignment = TextAnchor.MiddleCenter;
+            goalText.color = new Color(1f, 0.92f, 0.25f);
+            goalText.text = string.Empty;
+            goalText.enabled = false;
+
+            RectTransform goalRect = goalText.GetComponent<RectTransform>();
+            goalRect.anchorMin = new Vector2(0f, 0.62f);
+            goalRect.anchorMax = new Vector2(1f, 0.82f);
+            goalRect.pivot = new Vector2(0.5f, 0.5f);
+            goalRect.offsetMin = Vector2.zero;
+            goalRect.offsetMax = Vector2.zero;
+
+            return new[] { text, goalText };
         }
 
         private static Rigidbody EnsureRigidbody(GameObject target)
@@ -389,12 +459,13 @@ namespace MiniFootball.EditorTools
             }
         }
 
-        private static void AddPlayAreaLimiter(GameObject target)
+        private static void AddPlayAreaLimiter(GameObject target, Vector2 halfSize)
         {
             System.Type limiterType = System.Type.GetType("MiniFootball.PlayAreaLimiter, Assembly-CSharp");
             if (limiterType != null && target.GetComponent(limiterType) == null)
             {
-                target.AddComponent(limiterType);
+                Component limiter = target.AddComponent(limiterType);
+                SetVector2(limiter, "halfSize", halfSize);
             }
         }
 
@@ -449,6 +520,14 @@ namespace MiniFootball.EditorTools
             serializedObject.ApplyModifiedProperties();
         }
 
+        private static void SetVector2(Object target, string propertyName, Vector2 value)
+        {
+            SerializedObject serializedObject = new SerializedObject(target);
+            SerializedProperty property = serializedObject.FindProperty(propertyName);
+            property.vector2Value = value;
+            serializedObject.ApplyModifiedProperties();
+        }
+
         private static void SetFloat(Object target, string propertyName, float value)
         {
             SerializedObject serializedObject = new SerializedObject(target);
@@ -463,6 +542,20 @@ namespace MiniFootball.EditorTools
             SerializedProperty property = serializedObject.FindProperty("controlScheme");
             property.enumValueIndex = (int)value;
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private static MiniFootballSceneSettings LoadOrCreateSettings()
+        {
+            MiniFootballSceneSettings settings = AssetDatabase.LoadAssetAtPath<MiniFootballSceneSettings>(SettingsAssetPath);
+            if (settings != null)
+            {
+                return settings;
+            }
+
+            settings = ScriptableObject.CreateInstance<MiniFootballSceneSettings>();
+            AssetDatabase.CreateAsset(settings, SettingsAssetPath);
+            AssetDatabase.SaveAssets();
+            return settings;
         }
     }
 }

@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41f1e55e24c64f64a8b9c4d2bfcc0d61, type: 3}
+  m_Name: MiniFootballSceneSettings
+  m_EditorClassIdentifier: Assembly-CSharp::MiniFootball.MiniFootballSceneSettings
+  fieldWidth: 12
+  fieldLength: 20
+  groundY: -0.05
+  groundColor: {r: 0.11999986, g: 0.5499999, b: 0.19999987, a: 1}
+  lineColor: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  goalOpeningHalfWidth: 3.2
+  goalDepth: 1.0999999
+  goalTriggerHeight: 2.7
+  goalTriggerDepth: 0.45
+  goalScale: {x: 2.6, y: 2.2, z: 2.2}
+  wallHeight: 3.2
+  wallThickness: 0.45
+  wallColor: {r: 0.059999898, g: 0.0799999, b: 0.09999988, a: 1}
+  goalNetColor: {r: 0.86, g: 0.9, b: 0.92, a: 1}
+  playAreaHalfSize: {x: 5.55, y: 10.85}
+  ballSpawnPosition: {x: 0, y: 0.35, z: 0}
+  ballScale: 0.5
+  player1SpawnPosition: {x: 0, y: 1, z: -4.5}
+  player2SpawnPosition: {x: 0, y: 1, z: 4.5}
+  playerScale: 1.15
+  player1Color: {r: 0.09999988, g: 0.34999987, b: 1, a: 1}
+  player2Color: {r: 1, g: 0.17999989, b: 0.11999986, a: 1}
+  cameraOffset: {x: 0, y: 6.5, z: -7.5}
+  cameraEuler: {x: 48, y: 0, z: 0}
+  cameraFov: 55
+  skyColor: {r: 0.45, g: 0.68, b: 0.88, a: 1}
+  createStands: 1
+  createAdvertisingBoards: 1
+  createFloodlights: 0
+  standDarkColor: {r: 0.0699999, g: 0.08999991, b: 0.12999988, a: 1}
+  standBlueColor: {r: 0.04, g: 0.19999987, b: 0.5499999, a: 1}
+  standRedColor: {r: 0.72, g: 0.0799999, b: 0.11999986, a: 1}
+  adLeftColor: {r: 0.95, g: 0.88, b: 0.17999989, a: 1}
+  adRightColor: {r: 0.17999989, g: 0.82, b: 0.95, a: 1}
+  floodlightColor: {r: 1, g: 0.95, b: 0.74, a: 1}
