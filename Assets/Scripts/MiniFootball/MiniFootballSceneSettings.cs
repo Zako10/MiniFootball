@@ -1,6 +1,20 @@
 namespace MiniFootball
 {
+    using System.Collections.Generic;
     using UnityEngine;
+
+    [System.Serializable]
+    public class MiniFootballObjectOverride
+    {
+        public string objectName;
+        public bool exists = true;
+        public bool active = true;
+        public Vector3 position;
+        public Vector3 eulerAngles;
+        public Vector3 scale = Vector3.one;
+        public bool hasColor;
+        public Color color = Color.white;
+    }
 
     [CreateAssetMenu(menuName = "MiniFootball/Scene Settings")]
     public class MiniFootballSceneSettings : ScriptableObject
@@ -51,6 +65,9 @@ namespace MiniFootball
         public Color adLeftColor = new Color(0.95f, 0.88f, 0.18f);
         public Color adRightColor = new Color(0.18f, 0.82f, 0.95f);
         public Color floodlightColor = new Color(1f, 0.95f, 0.74f);
+
+        [Header("Captured Scene Overrides")]
+        public List<MiniFootballObjectOverride> objectOverrides = new List<MiniFootballObjectOverride>();
 
         public float HalfFieldWidth => fieldWidth * 0.5f;
         public float HalfFieldLength => fieldLength * 0.5f;

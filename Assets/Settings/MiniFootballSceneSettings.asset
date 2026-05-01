@@ -15,7 +15,7 @@ MonoBehaviour:
   fieldWidth: 12
   fieldLength: 20
   groundY: -0.05
-  groundColor: {r: 0.11999986, g: 0.5499999, b: 0.19999987, a: 1}
+  groundColor: {r: 0.119999774, g: 0.5499999, b: 0.19999978, a: 1}
   lineColor: {r: 0.94, g: 0.94, b: 0.88, a: 1}
   goalOpeningHalfWidth: 3.2
   goalDepth: 1.0999999
@@ -24,7 +24,7 @@ MonoBehaviour:
   goalScale: {x: 2.6, y: 2.2, z: 2.2}
   wallHeight: 3.2
   wallThickness: 0.45
-  wallColor: {r: 0.059999898, g: 0.0799999, b: 0.09999988, a: 1}
+  wallColor: {r: 0.059999824, g: 0.07999983, b: 0.09999979, a: 1}
   goalNetColor: {r: 0.86, g: 0.9, b: 0.92, a: 1}
   playAreaHalfSize: {x: 5.55, y: 10.85}
   ballSpawnPosition: {x: 0, y: 0.35, z: 0}
@@ -32,18 +32,739 @@ MonoBehaviour:
   player1SpawnPosition: {x: 0, y: 1, z: -4.5}
   player2SpawnPosition: {x: 0, y: 1, z: 4.5}
   playerScale: 1.15
-  player1Color: {r: 0.09999988, g: 0.34999987, b: 1, a: 1}
-  player2Color: {r: 1, g: 0.17999989, b: 0.11999986, a: 1}
+  player1Color: {r: 0.09999979, g: 0.3499998, b: 1, a: 1}
+  player2Color: {r: 1, g: 0.1799998, b: 0.119999774, a: 1}
   cameraOffset: {x: 0, y: 6.5, z: -7.5}
   cameraEuler: {x: 48, y: 0, z: 0}
   cameraFov: 55
   skyColor: {r: 0.45, g: 0.68, b: 0.88, a: 1}
-  createStands: 1
+  createStands: 0
   createAdvertisingBoards: 1
   createFloodlights: 0
   standDarkColor: {r: 0.0699999, g: 0.08999991, b: 0.12999988, a: 1}
-  standBlueColor: {r: 0.04, g: 0.19999987, b: 0.5499999, a: 1}
-  standRedColor: {r: 0.72, g: 0.0799999, b: 0.11999986, a: 1}
-  adLeftColor: {r: 0.95, g: 0.88, b: 0.17999989, a: 1}
-  adRightColor: {r: 0.17999989, g: 0.82, b: 0.95, a: 1}
+  standBlueColor: {r: 0.04, g: 0.19999984, b: 0.5499999, a: 1}
+  standRedColor: {r: 0.72, g: 0.07999989, b: 0.11999983, a: 1}
+  adLeftColor: {r: 0.95, g: 0.88, b: 0.1799998, a: 1}
+  adRightColor: {r: 0.17999986, g: 0.82, b: 0.95, a: 1}
   floodlightColor: {r: 1, g: 0.95, b: 0.74, a: 1}
+  objectOverrides:
+  - objectName: Ground
+    exists: 1
+    active: 1
+    position: {x: 0, y: -0.05, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 12, y: 0.1, z: 20}
+    hasColor: 1
+    color: {r: 0.119999774, g: 0.5499999, b: 0.19999978, a: 1}
+  - objectName: Ball
+    exists: 1
+    active: 1
+    position: {x: 0, y: 0.35, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 0.5, y: 0.5, z: 0.5}
+    hasColor: 1
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: Player 1
+    exists: 1
+    active: 1
+    position: {x: 0, y: 1, z: -4.5}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 1.15, y: 1.15, z: 1.15}
+    hasColor: 1
+    color: {r: 0.09999979, g: 0.3499998, b: 1, a: 1}
+  - objectName: Player 2
+    exists: 1
+    active: 1
+    position: {x: 0, y: 1, z: 4.5}
+    eulerAngles: {x: -0, y: 180, z: 0}
+    scale: {x: 1.15, y: 1.15, z: 1.15}
+    hasColor: 1
+    color: {r: 1, g: 0.1799998, b: 0.119999774, a: 1}
+  - objectName: Player 1 Goal
+    exists: 1
+    active: 1
+    position: {x: 0, y: 0, z: -10}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 2.6, y: 2.2, z: 2.2}
+    hasColor: 1
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: Player 2 Goal
+    exists: 1
+    active: 1
+    position: {x: 0, y: 0, z: 10}
+    eulerAngles: {x: -0, y: 180, z: 0}
+    scale: {x: 2.6, y: 2.2, z: 2.2}
+    hasColor: 1
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: Player 1 Goal Trigger
+    exists: 1
+    active: 1
+    position: {x: 0, y: 1.35, z: -10.1}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 6.4, y: 2.7, z: 0.45}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: Player 2 Goal Trigger
+    exists: 1
+    active: 1
+    position: {x: 0, y: 1.35, z: 10.1}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 6.4, y: 2.7, z: 0.45}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: GameManager
+    exists: 1
+    active: 1
+    position: {x: 0, y: 0, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: Player1Spawn
+    exists: 1
+    active: 1
+    position: {x: 0, y: 1, z: -4.5}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: Player2Spawn
+    exists: 1
+    active: 1
+    position: {x: 0, y: 1, z: 4.5}
+    eulerAngles: {x: -0, y: 180, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: BallSpawn
+    exists: 1
+    active: 1
+    position: {x: 0, y: 0.35, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: Pitch Lines
+    exists: 1
+    active: 1
+    position: {x: 0, y: 0, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Boundary Walls
+    exists: 1
+    active: 1
+    position: {x: 0, y: 0, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 1
+    color: {r: 0.059999824, g: 0.07999983, b: 0.09999979, a: 1}
+  - objectName: HUD Canvas
+    exists: 1
+    active: 1
+    position: {x: 442.19998, y: 190.9, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: Scoreboard Panel
+    exists: 1
+    active: 1
+    position: {x: 18, y: 363.8, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: Scoreboard
+    exists: 1
+    active: 1
+    position: {x: 103, y: 324.8, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: Goal Message
+    exists: 1
+    active: 1
+    position: {x: 442.19998, y: 274.896, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: Sports Backdrop
+    exists: 1
+    active: 1
+    position: {x: 0, y: 0, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 1
+    color: {r: 0.95, g: 0.88, b: 0.1799998, a: 1}
+  - objectName: Left Touchline
+    exists: 1
+    active: 1
+    position: {x: -6, y: 0.006, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 0.12, y: 0.012, z: 20}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Right Touchline
+    exists: 1
+    active: 1
+    position: {x: 6, y: 0.006, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 0.12, y: 0.012, z: 20}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Player Goal Line
+    exists: 1
+    active: 1
+    position: {x: 0, y: 0.006, z: -10}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 12, y: 0.012, z: 0.12}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Computer Goal Line
+    exists: 1
+    active: 1
+    position: {x: 0, y: 0.006, z: 10}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 12, y: 0.012, z: 0.12}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Halfway Line
+    exists: 1
+    active: 1
+    position: {x: 0, y: 0.007, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 12, y: 0.012, z: 0.1}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Player Box
+    exists: 1
+    active: 1
+    position: {x: 0, y: 0.008, z: -8}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 5.4, y: 0.012, z: 0.1}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Player Box Left
+    exists: 1
+    active: 1
+    position: {x: -2.7, y: 0.008, z: -9}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 0.1, y: 0.012, z: 2}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Player Box Right
+    exists: 1
+    active: 1
+    position: {x: 2.7, y: 0.008, z: -9}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 0.1, y: 0.012, z: 2}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Computer Box
+    exists: 1
+    active: 1
+    position: {x: 0, y: 0.008, z: 8}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 5.4, y: 0.012, z: 0.1}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Computer Box Left
+    exists: 1
+    active: 1
+    position: {x: -2.7, y: 0.008, z: 9}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 0.1, y: 0.012, z: 2}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Computer Box Right
+    exists: 1
+    active: 1
+    position: {x: 2.7, y: 0.008, z: 9}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 0.1, y: 0.012, z: 2}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Left Wall
+    exists: 1
+    active: 1
+    position: {x: -6.225, y: 1.6, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 0.45, y: 3.2, z: 22.2}
+    hasColor: 1
+    color: {r: 0.059999824, g: 0.07999983, b: 0.09999979, a: 1}
+  - objectName: Right Wall
+    exists: 1
+    active: 1
+    position: {x: 6.225, y: 1.6, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 0.45, y: 3.2, z: 22.2}
+    hasColor: 1
+    color: {r: 0.059999824, g: 0.07999983, b: 0.09999979, a: 1}
+  - objectName: Player End Wall Left
+    exists: 1
+    active: 1
+    position: {x: -4.6, y: 1.6, z: -10.225}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 2.8, y: 3.2, z: 0.45}
+    hasColor: 1
+    color: {r: 0.059999824, g: 0.07999983, b: 0.09999979, a: 1}
+  - objectName: Player End Wall Right
+    exists: 1
+    active: 1
+    position: {x: 4.6, y: 1.6, z: -10.225}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 2.8, y: 3.2, z: 0.45}
+    hasColor: 1
+    color: {r: 0.059999824, g: 0.07999983, b: 0.09999979, a: 1}
+  - objectName: Computer End Wall Left
+    exists: 1
+    active: 1
+    position: {x: -4.6, y: 1.6, z: 10.225}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 2.8, y: 3.2, z: 0.45}
+    hasColor: 1
+    color: {r: 0.059999824, g: 0.07999983, b: 0.09999979, a: 1}
+  - objectName: Computer End Wall Right
+    exists: 1
+    active: 1
+    position: {x: 4.6, y: 1.6, z: 10.225}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 2.8, y: 3.2, z: 0.45}
+    hasColor: 1
+    color: {r: 0.059999824, g: 0.07999983, b: 0.09999979, a: 1}
+  - objectName: Player Goal Back Wall
+    exists: 1
+    active: 1
+    position: {x: 0, y: 1.6, z: -11.1}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 7.3, y: 3.2, z: 0.45}
+    hasColor: 1
+    color: {r: 0.86, g: 0.9, b: 0.92, a: 1}
+  - objectName: Computer Goal Back Wall
+    exists: 1
+    active: 1
+    position: {x: 0, y: 1.6, z: 11.1}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 7.3, y: 3.2, z: 0.45}
+    hasColor: 1
+    color: {r: 0.86, g: 0.9, b: 0.92, a: 1}
+  - objectName: Player Goal Left Wall
+    exists: 1
+    active: 1
+    position: {x: -3.425, y: 1.6, z: -10.55}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 0.45, y: 3.2, z: 1.55}
+    hasColor: 1
+    color: {r: 0.86, g: 0.9, b: 0.92, a: 1}
+  - objectName: Player Goal Right Wall
+    exists: 1
+    active: 1
+    position: {x: 3.425, y: 1.6, z: -10.55}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 0.45, y: 3.2, z: 1.55}
+    hasColor: 1
+    color: {r: 0.86, g: 0.9, b: 0.92, a: 1}
+  - objectName: Computer Goal Left Wall
+    exists: 1
+    active: 1
+    position: {x: -3.425, y: 1.6, z: 10.55}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 0.45, y: 3.2, z: 1.55}
+    hasColor: 1
+    color: {r: 0.86, g: 0.9, b: 0.92, a: 1}
+  - objectName: Computer Goal Right Wall
+    exists: 1
+    active: 1
+    position: {x: 3.425, y: 1.6, z: 10.55}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 0.45, y: 3.2, z: 1.55}
+    hasColor: 1
+    color: {r: 0.86, g: 0.9, b: 0.92, a: 1}
+  - objectName: North Stand Base
+    exists: 0
+    active: 1
+    position: {x: 0, y: 0, z: 0}
+    eulerAngles: {x: 0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: South Stand Base
+    exists: 0
+    active: 1
+    position: {x: 0, y: 0, z: 0}
+    eulerAngles: {x: 0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: North Stand Seats
+    exists: 0
+    active: 1
+    position: {x: 0, y: 0, z: 0}
+    eulerAngles: {x: 0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: South Stand Seats
+    exists: 0
+    active: 1
+    position: {x: 0, y: 0, z: 0}
+    eulerAngles: {x: 0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: Left Advertising Board
+    exists: 1
+    active: 1
+    position: {x: -7.15, y: 0.45, z: 0}
+    eulerAngles: {x: -0, y: 0, z: 0}
+    scale: {x: 0.18, y: 0.9, z: 20}
+    hasColor: 1
+    color: {r: 0.95, g: 0.88, b: 0.1799998, a: 1}
+  - objectName: Right Advertising Board
+    exists: 0
+    active: 1
+    position: {x: 0, y: 0, z: 0}
+    eulerAngles: {x: 0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: Left Floodlight
+    exists: 0
+    active: 1
+    position: {x: 0, y: 0, z: 0}
+    eulerAngles: {x: 0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: Right Floodlight
+    exists: 0
+    active: 1
+    position: {x: 0, y: 0, z: 0}
+    eulerAngles: {x: 0, y: 0, z: 0}
+    scale: {x: 1, y: 1, z: 1}
+    hasColor: 0
+    color: {r: 1, g: 1, b: 1, a: 1}
+  - objectName: Center Circle Segment 1
+    exists: 1
+    active: 1
+    position: {x: 1.7889194, y: 0.008, z: 0.14079103}
+    eulerAngles: {x: -0, y: 355.50003, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245276}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 2
+    exists: 1
+    active: 1
+    position: {x: 1.7448704, y: 0.008, z: 0.41890633}
+    eulerAngles: {x: -0, y: 346.5, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245273}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 3
+    exists: 1
+    active: 1
+    position: {x: 1.6578567, y: 0.008, z: 0.6867068}
+    eulerAngles: {x: -0, y: 337.5, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245276}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 4
+    exists: 1
+    active: 1
+    position: {x: 1.5300212, y: 0.008, z: 0.93759817}
+    eulerAngles: {x: -0, y: 328.49997, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245276}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 5
+    exists: 1
+    active: 1
+    position: {x: 1.3645113, y: 0.008, z: 1.1654028}
+    eulerAngles: {x: -0, y: 319.5, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.2824527}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 6
+    exists: 1
+    active: 1
+    position: {x: 1.1654028, y: 0.008, z: 1.3645113}
+    eulerAngles: {x: -0, y: 310.5, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.2824527}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 7
+    exists: 1
+    active: 1
+    position: {x: 0.93759817, y: 0.008, z: 1.5300212}
+    eulerAngles: {x: -0, y: 301.5, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245276}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 8
+    exists: 1
+    active: 1
+    position: {x: 0.6867067, y: 0.008, z: 1.6578567}
+    eulerAngles: {x: -0, y: 292.5, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245282}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 9
+    exists: 1
+    active: 1
+    position: {x: 0.4189062, y: 0.008, z: 1.7448704}
+    eulerAngles: {x: -0, y: 283.5, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245288}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 10
+    exists: 1
+    active: 1
+    position: {x: 0.14079088, y: 0.008, z: 1.7889194}
+    eulerAngles: {x: -0, y: 274.5, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.2824526}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 11
+    exists: 1
+    active: 1
+    position: {x: -0.14079104, y: 0.008, z: 1.7889194}
+    eulerAngles: {x: -0, y: 265.50003, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.2824526}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 12
+    exists: 1
+    active: 1
+    position: {x: -0.41890633, y: 0.008, z: 1.7448704}
+    eulerAngles: {x: -0, y: 256.49997, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245288}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 13
+    exists: 1
+    active: 1
+    position: {x: -0.6867069, y: 0.008, z: 1.6578567}
+    eulerAngles: {x: -0, y: 247.5, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245285}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 14
+    exists: 1
+    active: 1
+    position: {x: -0.9375982, y: 0.008, z: 1.5300211}
+    eulerAngles: {x: 0, y: 238.49997, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245246}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 15
+    exists: 1
+    active: 1
+    position: {x: -1.1654027, y: 0.008, z: 1.3645113}
+    eulerAngles: {x: 0, y: 229.5, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.2824528}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 16
+    exists: 1
+    active: 1
+    position: {x: -1.3645114, y: 0.008, z: 1.1654027}
+    eulerAngles: {x: 0, y: 220.50002, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245288}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 17
+    exists: 1
+    active: 1
+    position: {x: -1.5300212, y: 0.008, z: 0.937598}
+    eulerAngles: {x: 0, y: 211.5, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245288}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 18
+    exists: 1
+    active: 1
+    position: {x: -1.6578568, y: 0.008, z: 0.6867064}
+    eulerAngles: {x: 0, y: 202.49997, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245288}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 19
+    exists: 1
+    active: 1
+    position: {x: -1.7448704, y: 0.008, z: 0.4189061}
+    eulerAngles: {x: 0, y: 193.50002, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.2824524}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 20
+    exists: 1
+    active: 1
+    position: {x: -1.7889194, y: 0.008, z: 0.14079092}
+    eulerAngles: {x: 0, y: 184.49998, z: 0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245285}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 21
+    exists: 1
+    active: 1
+    position: {x: -1.7889194, y: 0.008, z: -0.14079122}
+    eulerAngles: {x: -0, y: 175.5, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245285}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 22
+    exists: 1
+    active: 1
+    position: {x: -1.7448704, y: 0.008, z: -0.41890642}
+    eulerAngles: {x: -0, y: 166.50002, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245243}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 23
+    exists: 1
+    active: 1
+    position: {x: -1.6578567, y: 0.008, z: -0.6867068}
+    eulerAngles: {x: -0, y: 157.5, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245285}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 24
+    exists: 1
+    active: 1
+    position: {x: -1.5300211, y: 0.008, z: -0.93759835}
+    eulerAngles: {x: -0, y: 148.49998, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245297}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 25
+    exists: 1
+    active: 1
+    position: {x: -1.3645113, y: 0.008, z: -1.165403}
+    eulerAngles: {x: -0, y: 139.49998, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.2824527}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 26
+    exists: 1
+    active: 1
+    position: {x: -1.1654025, y: 0.008, z: -1.3645115}
+    eulerAngles: {x: -0, y: 130.49998, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245288}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 27
+    exists: 1
+    active: 1
+    position: {x: -0.93759775, y: 0.008, z: -1.5300214}
+    eulerAngles: {x: -0, y: 121.5, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.2824529}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 28
+    exists: 1
+    active: 1
+    position: {x: -0.68670654, y: 0.008, z: -1.6578568}
+    eulerAngles: {x: -0, y: 112.5, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245202}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 29
+    exists: 1
+    active: 1
+    position: {x: -0.41890642, y: 0.008, z: -1.7448703}
+    eulerAngles: {x: -0, y: 103.49999, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.2824528}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 30
+    exists: 1
+    active: 1
+    position: {x: -0.14079104, y: 0.008, z: -1.7889194}
+    eulerAngles: {x: -0, y: 94.500015, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245285}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 31
+    exists: 1
+    active: 1
+    position: {x: 0.14079109, y: 0.008, z: -1.7889194}
+    eulerAngles: {x: -0, y: 85.49999, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245282}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 32
+    exists: 1
+    active: 1
+    position: {x: 0.41890645, y: 0.008, z: -1.7448703}
+    eulerAngles: {x: -0, y: 76.500015, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245282}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 33
+    exists: 1
+    active: 1
+    position: {x: 0.686707, y: 0.008, z: -1.6578566}
+    eulerAngles: {x: -0, y: 67.49997, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.2824529}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 34
+    exists: 1
+    active: 1
+    position: {x: 0.93759847, y: 0.008, z: -1.530021}
+    eulerAngles: {x: -0, y: 58.499996, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245282}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 35
+    exists: 1
+    active: 1
+    position: {x: 1.1654031, y: 0.008, z: -1.364511}
+    eulerAngles: {x: -0, y: 49.499977, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245288}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 36
+    exists: 1
+    active: 1
+    position: {x: 1.3645117, y: 0.008, z: -1.1654023}
+    eulerAngles: {x: -0, y: 40.49999, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245288}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 37
+    exists: 1
+    active: 1
+    position: {x: 1.5300214, y: 0.008, z: -0.9375979}
+    eulerAngles: {x: -0, y: 31.5, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245202}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 38
+    exists: 1
+    active: 1
+    position: {x: 1.6578567, y: 0.008, z: -0.68670666}
+    eulerAngles: {x: -0, y: 22.500002, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245285}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 39
+    exists: 1
+    active: 1
+    position: {x: 1.7448704, y: 0.008, z: -0.41890615}
+    eulerAngles: {x: -0, y: 13.499997, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245282}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}
+  - objectName: Center Circle Segment 40
+    exists: 1
+    active: 1
+    position: {x: 1.7889194, y: 0.008, z: -0.14079076}
+    eulerAngles: {x: -0, y: 4.499977, z: -0}
+    scale: {x: 0.08, y: 0.012, z: 0.28245288}
+    hasColor: 1
+    color: {r: 0.94, g: 0.94, b: 0.88, a: 1}

@@ -1,5 +1,6 @@
 namespace MiniFootball.EditorTools
 {
+    using System.Collections.Generic;
     using MiniFootball;
     using UnityEditor;
     using UnityEditor.SceneManagement;
@@ -13,7 +14,6 @@ namespace MiniFootball.EditorTools
         private const string GroundPrefabPath = "Assets/Lightning Poly/Football Essentials 3D/Prefabs/Ground.prefab";
         private const string GoalPrefabPath = "Assets/Lightning Poly/Football Essentials 3D/Prefabs/Goal.prefab";
         private const string SettingsAssetPath = "Assets/Settings/MiniFootballSceneSettings.asset";
-
         [MenuItem("MiniFootball/Build First Playable Scene")]
         public static void BuildFirstPlayableScene()
         {
@@ -110,10 +110,81 @@ namespace MiniFootball.EditorTools
                 SetVector3(followCamera, "offset", settings.cameraOffset);
             }
 
+            ApplyCapturedObjectOverrides(settings);
+
             Selection.activeGameObject = player1;
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
             EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
             Debug.Log("MiniFootball local 1v1 scene is built and saved. Player 1: arrows + Space. Player 2: WASD + Left Shift.");
+        }
+
+        [MenuItem("MiniFootball/Capture Current Scene Settings")]
+        public static void CaptureCurrentSceneSettings()
+        {
+            MiniFootballSceneSettings settings = LoadOrCreateSettings();
+
+            GameObject ground = GameObject.Find("Ground");
+            if (ground != null)
+            {
+                settings.fieldWidth = ground.transform.localScale.x;
+                settings.fieldLength = ground.transform.localScale.z;
+                settings.groundY = ground.transform.position.y;
+                settings.groundColor = ReadColor(ground, settings.groundColor);
+            }
+
+            CaptureTransform("Ball", value => settings.ballSpawnPosition = value.position, value => settings.ballScale = value.localScale.x);
+            CaptureTransform("Player 1", value => settings.player1SpawnPosition = value.position, value => settings.playerScale = value.localScale.x);
+            CaptureTransform("Player 2", value => settings.player2SpawnPosition = value.position, value => settings.playerScale = value.localScale.x);
+
+            GameObject player1 = GameObject.Find("Player 1");
+            if (player1 != null)
+            {
+                settings.player1Color = ReadColorInChildren(player1, settings.player1Color);
+            }
+
+            GameObject player2 = GameObject.Find("Player 2");
+            if (player2 != null)
+            {
+                settings.player2Color = ReadColorInChildren(player2, settings.player2Color);
+            }
+
+            GameObject player1Goal = GameObject.Find("Player 1 Goal");
+            if (player1Goal != null)
+            {
+                settings.goalScale = player1Goal.transform.localScale;
+            }
+
+            GameObject trigger = GameObject.Find("Player 2 Goal Trigger") ?? GameObject.Find("Player 1 Goal Trigger");
+            if (trigger != null)
+            {
+                settings.goalOpeningHalfWidth = trigger.transform.localScale.x * 0.5f;
+                settings.goalTriggerHeight = trigger.transform.localScale.y;
+                settings.goalTriggerDepth = trigger.transform.localScale.z;
+            }
+
+            GameObject leftWall = GameObject.Find("Left Wall");
+            if (leftWall != null)
+            {
+                settings.wallThickness = leftWall.transform.localScale.x;
+                settings.wallHeight = leftWall.transform.localScale.y;
+                settings.wallColor = ReadColor(leftWall, settings.wallColor);
+            }
+
+            GameObject goalSideWall = GameObject.Find("Player Goal Left Wall");
+            if (goalSideWall != null)
+            {
+                settings.goalDepth = Mathf.Max(0.1f, goalSideWall.transform.localScale.z - settings.wallThickness);
+                settings.goalNetColor = ReadColor(goalSideWall, settings.goalNetColor);
+            }
+
+            CapturePlayArea(settings);
+            CaptureBackdrop(settings);
+            CaptureCamera(settings);
+            CaptureGeneratedObjectOverrides(settings);
+
+            EditorUtility.SetDirty(settings);
+            AssetDatabase.SaveAssets();
+            Debug.Log($"Captured current scene settings only into {SettingsAssetPath}. No scene objects were rebuilt or deleted.");
         }
 
         private static GameObject InstantiatePrefab(string path, string objectName, Vector3 position, Quaternion rotation)
@@ -128,6 +199,249 @@ namespace MiniFootball.EditorTools
             instance.name = objectName;
             instance.transform.SetPositionAndRotation(position, rotation);
             return instance;
+        }
+
+        private static void CaptureGeneratedObjectOverrides(MiniFootballSceneSettings settings)
+        {
+            settings.objectOverrides.Clear();
+
+            foreach (string objectName in GetGeneratedObjectNames())
+            {
+                MiniFootballObjectOverride captured = new MiniFootballObjectOverride
+                {
+                    objectName = objectName
+                };
+
+                GameObject target = GameObject.Find(objectName);
+                if (target == null)
+                {
+                    captured.exists = false;
+                    settings.objectOverrides.Add(captured);
+                    continue;
+                }
+
+                captured.exists = true;
+                captured.active = target.activeSelf;
+                captured.position = target.transform.position;
+                captured.eulerAngles = target.transform.rotation.eulerAngles;
+                captured.scale = target.transform.localScale;
+
+                Renderer renderer = target.GetComponentInChildren<Renderer>();
+                if (renderer != null && renderer.sharedMaterial != null)
+                {
+                    captured.hasColor = true;
+                    captured.color = renderer.sharedMaterial.color;
+                }
+
+                settings.objectOverrides.Add(captured);
+            }
+        }
+
+        private static void ApplyCapturedObjectOverrides(MiniFootballSceneSettings settings)
+        {
+            if (settings.objectOverrides == null || settings.objectOverrides.Count == 0)
+            {
+                return;
+            }
+
+            foreach (MiniFootballObjectOverride captured in settings.objectOverrides)
+            {
+                if (string.IsNullOrEmpty(captured.objectName))
+                {
+                    continue;
+                }
+
+                GameObject target = GameObject.Find(captured.objectName);
+                if (target == null)
+                {
+                    continue;
+                }
+
+                if (!captured.exists)
+                {
+                    Object.DestroyImmediate(target);
+                    continue;
+                }
+
+                target.SetActive(captured.active);
+                target.transform.position = captured.position;
+                target.transform.rotation = Quaternion.Euler(captured.eulerAngles);
+                target.transform.localScale = captured.scale;
+
+                if (captured.hasColor)
+                {
+                    SetMaterialColorRecursive(target, captured.color);
+                }
+            }
+        }
+
+        private static void CaptureTransform(string objectName, System.Action<Transform> capturePosition, System.Action<Transform> captureScale)
+        {
+            GameObject target = GameObject.Find(objectName);
+            if (target == null)
+            {
+                return;
+            }
+
+            capturePosition?.Invoke(target.transform);
+            captureScale?.Invoke(target.transform);
+        }
+
+        private static IEnumerable<string> GetGeneratedObjectNames()
+        {
+            string[] fixedNames =
+            {
+                "Ground",
+                "Ball",
+                "Player 1",
+                "Player 2",
+                "Player 1 Goal",
+                "Player 2 Goal",
+                "Player 1 Goal Trigger",
+                "Player 2 Goal Trigger",
+                "GameManager",
+                "Player1Spawn",
+                "Player2Spawn",
+                "BallSpawn",
+                "Pitch Lines",
+                "Boundary Walls",
+                "HUD Canvas",
+                "Scoreboard Panel",
+                "Scoreboard",
+                "Goal Message",
+                "Sports Backdrop",
+                "Left Touchline",
+                "Right Touchline",
+                "Player Goal Line",
+                "Computer Goal Line",
+                "Halfway Line",
+                "Player Box",
+                "Player Box Left",
+                "Player Box Right",
+                "Computer Box",
+                "Computer Box Left",
+                "Computer Box Right",
+                "Left Wall",
+                "Right Wall",
+                "Player End Wall Left",
+                "Player End Wall Right",
+                "Computer End Wall Left",
+                "Computer End Wall Right",
+                "Player Goal Back Wall",
+                "Computer Goal Back Wall",
+                "Player Goal Left Wall",
+                "Player Goal Right Wall",
+                "Computer Goal Left Wall",
+                "Computer Goal Right Wall",
+                "North Stand Base",
+                "South Stand Base",
+                "North Stand Seats",
+                "South Stand Seats",
+                "Left Advertising Board",
+                "Right Advertising Board",
+                "Left Floodlight",
+                "Right Floodlight"
+            };
+
+            foreach (string objectName in fixedNames)
+            {
+                yield return objectName;
+            }
+
+            for (int i = 1; i <= 40; i++)
+            {
+                yield return $"Center Circle Segment {i}";
+            }
+        }
+
+        private static void CapturePlayArea(MiniFootballSceneSettings settings)
+        {
+            PlayAreaLimiter limiter = Object.FindAnyObjectByType<PlayAreaLimiter>();
+            if (limiter == null)
+            {
+                return;
+            }
+
+            SerializedObject serializedObject = new SerializedObject(limiter);
+            SerializedProperty halfSize = serializedObject.FindProperty("halfSize");
+            if (halfSize != null)
+            {
+                settings.playAreaHalfSize = halfSize.vector2Value;
+            }
+        }
+
+        private static void CaptureBackdrop(MiniFootballSceneSettings settings)
+        {
+            settings.createStands = ExistsAny("North Stand Base", "South Stand Base", "North Stand Seats", "South Stand Seats");
+            settings.createAdvertisingBoards = ExistsAny("Left Advertising Board", "Right Advertising Board");
+            settings.createFloodlights = ExistsAny("Left Floodlight", "Right Floodlight");
+
+            settings.standDarkColor = ReadColorByName("North Stand Base", settings.standDarkColor);
+            settings.standBlueColor = ReadColorByName("North Stand Seats", settings.standBlueColor);
+            settings.standRedColor = ReadColorByName("South Stand Seats", settings.standRedColor);
+            settings.adLeftColor = ReadColorByName("Left Advertising Board", settings.adLeftColor);
+            settings.adRightColor = ReadColorByName("Right Advertising Board", settings.adRightColor);
+            settings.floodlightColor = ReadColorByName("Left Floodlight", settings.floodlightColor);
+        }
+
+        private static void CaptureCamera(MiniFootballSceneSettings settings)
+        {
+            Camera mainCamera = Camera.main;
+            GameObject player1 = GameObject.Find("Player 1");
+            if (mainCamera == null)
+            {
+                return;
+            }
+
+            settings.skyColor = mainCamera.backgroundColor;
+            settings.cameraEuler = mainCamera.transform.rotation.eulerAngles;
+            settings.cameraFov = mainCamera.fieldOfView;
+
+            if (player1 != null)
+            {
+                settings.cameraOffset = mainCamera.transform.position - player1.transform.position;
+            }
+        }
+
+        private static bool ExistsAny(params string[] objectNames)
+        {
+            foreach (string objectName in objectNames)
+            {
+                if (GameObject.Find(objectName) != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static Color ReadColorByName(string objectName, Color fallback)
+        {
+            GameObject target = GameObject.Find(objectName);
+            return target == null ? fallback : ReadColor(target, fallback);
+        }
+
+        private static Color ReadColorInChildren(GameObject target, Color fallback)
+        {
+            Renderer renderer = target.GetComponentInChildren<Renderer>();
+            if (renderer == null || renderer.sharedMaterial == null)
+            {
+                return fallback;
+            }
+
+            return renderer.sharedMaterial.color;
+        }
+
+        private static Color ReadColor(GameObject target, Color fallback)
+        {
+            Renderer renderer = target.GetComponent<Renderer>();
+            if (renderer == null || renderer.sharedMaterial == null)
+            {
+                return fallback;
+            }
+
+            return renderer.sharedMaterial.color;
         }
 
         private static void ClearPreviousSetup()
@@ -200,6 +514,7 @@ namespace MiniFootball.EditorTools
             SetObjectReference(goalDetector, "gameManager", gameManager);
             SetFloat(goalDetector, "goalHalfWidth", settings.goalOpeningHalfWidth);
             SetFloat(goalDetector, "goalZ", settings.HalfFieldLength + 0.1f);
+            SetFloat(goalDetector, "goalTriggerDepth", settings.goalTriggerDepth);
             SetFloat(goalDetector, "maximumBallHeight", settings.goalTriggerHeight);
         }
 
@@ -266,15 +581,25 @@ namespace MiniFootball.EditorTools
                 directionalLight.transform.rotation = Quaternion.Euler(48f, -32f, 0f);
             }
 
-            CreateDecorBox(parent.transform, "North Stand Base", new Vector3(0f, 1f, settings.HalfFieldLength + 4f), new Vector3(15f, 2f, 1.2f), settings.standDarkColor);
-            CreateDecorBox(parent.transform, "South Stand Base", new Vector3(0f, 1f, -settings.HalfFieldLength - 4f), new Vector3(15f, 2f, 1.2f), settings.standDarkColor);
-            CreateDecorBox(parent.transform, "North Stand Seats", new Vector3(0f, 2.3f, settings.HalfFieldLength + 4.35f), new Vector3(14.2f, 1.2f, 0.45f), settings.standBlueColor);
-            CreateDecorBox(parent.transform, "South Stand Seats", new Vector3(0f, 2.3f, -settings.HalfFieldLength - 4.35f), new Vector3(14.2f, 1.2f, 0.45f), settings.standRedColor);
-            CreateDecorBox(parent.transform, "Left Advertising Board", new Vector3(-settings.HalfFieldWidth - 1.15f, 0.45f, 0f), new Vector3(0.18f, 0.9f, settings.fieldLength), settings.adLeftColor);
-            CreateDecorBox(parent.transform, "Right Advertising Board", new Vector3(settings.HalfFieldWidth + 1.15f, 0.45f, 0f), new Vector3(0.18f, 0.9f, settings.fieldLength), settings.adRightColor);
+            if (settings.createStands)
+            {
+                CreateDecorBox(parent.transform, "North Stand Base", new Vector3(0f, 1f, settings.HalfFieldLength + 4f), new Vector3(15f, 2f, 1.2f), settings.standDarkColor);
+                CreateDecorBox(parent.transform, "South Stand Base", new Vector3(0f, 1f, -settings.HalfFieldLength - 4f), new Vector3(15f, 2f, 1.2f), settings.standDarkColor);
+                CreateDecorBox(parent.transform, "North Stand Seats", new Vector3(0f, 2.3f, settings.HalfFieldLength + 4.35f), new Vector3(14.2f, 1.2f, 0.45f), settings.standBlueColor);
+                CreateDecorBox(parent.transform, "South Stand Seats", new Vector3(0f, 2.3f, -settings.HalfFieldLength - 4.35f), new Vector3(14.2f, 1.2f, 0.45f), settings.standRedColor);
+            }
 
-            CreateDecorBox(parent.transform, "Left Floodlight", new Vector3(-settings.HalfFieldWidth - 2f, 5.8f, -settings.HalfFieldLength - 2f), new Vector3(0.4f, 0.25f, 1.8f), settings.floodlightColor);
-            CreateDecorBox(parent.transform, "Right Floodlight", new Vector3(settings.HalfFieldWidth + 2f, 5.8f, settings.HalfFieldLength + 2f), new Vector3(0.4f, 0.25f, 1.8f), settings.floodlightColor);
+            if (settings.createAdvertisingBoards)
+            {
+                CreateDecorBox(parent.transform, "Left Advertising Board", new Vector3(-settings.HalfFieldWidth - 1.15f, 0.45f, 0f), new Vector3(0.18f, 0.9f, settings.fieldLength), settings.adLeftColor);
+                CreateDecorBox(parent.transform, "Right Advertising Board", new Vector3(settings.HalfFieldWidth + 1.15f, 0.45f, 0f), new Vector3(0.18f, 0.9f, settings.fieldLength), settings.adRightColor);
+            }
+
+            if (settings.createFloodlights)
+            {
+                CreateDecorBox(parent.transform, "Left Floodlight", new Vector3(-settings.HalfFieldWidth - 2f, 5.8f, -settings.HalfFieldLength - 2f), new Vector3(0.4f, 0.25f, 1.8f), settings.floodlightColor);
+                CreateDecorBox(parent.transform, "Right Floodlight", new Vector3(settings.HalfFieldWidth + 2f, 5.8f, settings.HalfFieldLength + 2f), new Vector3(0.4f, 0.25f, 1.8f), settings.floodlightColor);
+            }
         }
 
         private static void CreateCircle(Transform parent, string objectName, Vector3 center, float radius, int segments, Color color)
